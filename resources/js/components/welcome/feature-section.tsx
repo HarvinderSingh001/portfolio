@@ -1,526 +1,540 @@
-import React, { memo, useState, useEffect, useCallback, useRef } from 'react';
+import React, { memo, useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
-    SiHtml5, SiCss, SiJavascript, SiJquery, SiReact,
+    SiHtml5, SiCss, SiJavascript, SiTypescript, SiReact,
     SiPhp, SiLaravel, SiNodedotjs, SiExpress,
-    SiMysql, SiMongodb,
-    SiDocker, SiNginx, SiLinux, SiGit,
+    SiMysql, SiPostgresql, SiMongodb, SiRedis,
+    SiDocker, SiGit, SiLinux, SiNginx
 } from 'react-icons/si';
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useVelocity } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useVelocity, useAnimationFrame } from 'framer-motion';
 import { Reveal } from '../motion/Reveal';
 
-// ─── Brand icons (real react-icons/si) ────────────────────────────────────────
-const SZ = 40;
+// ─── Constants & Data ─────────────────────────────────────────────────────────
+
+const SZ = 32;
 const SkillIcons: Record<string, { icon: React.ReactNode; color: string }> = {
-    HTML:          { icon: <SiHtml5      size={SZ} />, color: '#e34f26' },
-    CSS:           { icon: <SiCss        size={SZ} />, color: '#1572b6' },
-    JS:            { icon: <SiJavascript size={SZ} />, color: '#f7df1e' },
-    JQUERY:        { icon: <SiJquery     size={SZ} />, color: '#0769ad' },
-    REACT:         { icon: <SiReact      size={SZ} />, color: '#61dafb' },
-    PHP:           { icon: <SiPhp        size={SZ} />, color: '#8993be' },
-    LARAVEL:       { icon: <SiLaravel    size={SZ} />, color: '#ff2d20' },
-    NODE:          { icon: <SiNodedotjs  size={SZ} />, color: '#68a063' },
-    EXPRESS:       { icon: <SiExpress    size={SZ} />, color: '#e0e0e0' },
-    MYSQL:         { icon: <SiMysql      size={SZ} />, color: '#00758f' },
-    MONGODB:       { icon: <SiMongodb    size={SZ} />, color: '#4db33d' },
-    'SCHEMA OPT.': { icon: <SiMysql      size={SZ} />, color: '#f59e0b' },
-    DOCKER:        { icon: <SiDocker     size={SZ} />, color: '#2496ed' },
-    NGINX:         { icon: <SiNginx      size={SZ} />, color: '#009639' },
-    LINUX:         { icon: <SiLinux      size={SZ} />, color: '#f5c518' },
-    GIT:           { icon: <SiGit        size={SZ} />, color: '#f05032' },
+    HTML:      { icon: <SiHtml5      size={SZ} />, color: '#E34F26' },
+    CSS:       { icon: <SiCss        size={SZ} />, color: '#1572B6' },
+    JS:        { icon: <SiJavascript size={SZ} />, color: '#F7DF1E' },
+    TS:        { icon: <SiTypescript size={SZ} />, color: '#3178C6' },
+    REACT:     { icon: <SiReact      size={SZ} />, color: '#61DAFB' },
+    PHP:       { icon: <SiPhp        size={SZ} />, color: '#777BB4' },
+    LARAVEL:   { icon: <SiLaravel    size={SZ} />, color: '#FF2D20' },
+    NODE:      { icon: <SiNodedotjs  size={SZ} />, color: '#339933' },
+    EXPRESS:   { icon: <SiExpress    size={SZ} />, color: '#ffffff' },
+    MYSQL:     { icon: <SiMysql      size={SZ} />, color: '#4479A1' },
+    POSTGRES:  { icon: <SiPostgresql size={SZ} />, color: '#336791' },
+    MONGODB:   { icon: <SiMongodb    size={SZ} />, color: '#47A248' },
+    REDIS:     { icon: <SiRedis      size={SZ} />, color: '#DC382D' },
+    DOCKER:    { icon: <SiDocker     size={SZ} />, color: '#2496ED' },
+    GIT:       { icon: <SiGit        size={SZ} />, color: '#F05032' },
+    LINUX:     { icon: <SiLinux      size={SZ} />, color: '#FCC624' },
+    NGINX:     { icon: <SiNginx      size={SZ} />, color: '#009639' },
 };
 
-// ─── Card data ─────────────────────────────────────────────────────────────────
+const SKILL_CONNECTIONS = [
+    // Frontend internal
+    { from: 'HTML', to: 'CSS', color: '#E34F26' },
+    { from: 'CSS', to: 'JS', color: '#1572B6' },
+    { from: 'JS', to: 'TS', color: '#F7DF1E' },
+    { from: 'TS', to: 'REACT', color: '#3178C6' },
+
+    // Frontend -> Backend
+    { from: 'REACT', to: 'NODE', color: '#61DAFB' },
+    { from: 'REACT', to: 'LARAVEL', color: '#61DAFB' },
+
+    // Backend internal
+    { from: 'NODE', to: 'EXPRESS', color: '#339933' },
+    { from: 'PHP', to: 'LARAVEL', color: '#777BB4' },
+
+    // Backend -> Database
+    { from: 'EXPRESS', to: 'MONGODB', color: '#ffffff' },
+    { from: 'LARAVEL', to: 'MYSQL', color: '#FF2D20' },
+    { from: 'NODE', to: 'REDIS', color: '#339933' },
+    { from: 'LARAVEL', to: 'POSTGRES', color: '#FF2D20' },
+
+    // Connectivity & DevOps
+    { from: 'GIT', to: 'NODE', color: '#F05032' },
+    { from: 'GIT', to: 'LARAVEL', color: '#F05032' },
+    { from: 'NGINX', to: 'LARAVEL', color: '#009639' },
+    { from: 'NGINX', to: 'NODE', color: '#009639' },
+    { from: 'DOCKER', to: 'LINUX', color: '#2496ED' },
+    { from: 'NGINX', to: 'DOCKER', color: '#009639' },
+];
+
 const cards = [
     {
         id: 0,
-        category: '01 — Frontend',
-        title: 'Frontend Innovation',
-        description:
-            'Crafting high-fidelity, reactive interfaces that prioritize user experience and performance consistency.',
+        title: 'Neural Interfaces',
+        description: 'Building sentient UIs that anticipate user intent through motion, physics, and cognitive design patterns.',
         accent: '#00f5ff',
-        skills: ['HTML', 'CSS', 'JS', 'JQUERY', 'REACT'],
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" />
-                <line x1="3" y1="9" x2="21" y2="9" />
-                <line x1="9" y1="21" x2="9" y2="9" />
-            </svg>
-        ),
+        label: 'LAYER_ONE',
+        icon: '01'
     },
     {
         id: 1,
-        category: '02 — Backend',
-        title: 'Backend Logic & APIs',
-        description:
-            'Engineered for throughput and security. Building the robust neural networks that power digital businesses.',
-        accent: '#a78bfa',
-        skills: ['PHP', 'LARAVEL', 'NODE', 'EXPRESS'],
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-            </svg>
-        ),
+        title: 'Elastic Architecture',
+        description: 'Fault-tolerant distributed systems engineered for extreme scale and sub-millisecond orchestration.',
+        accent: '#7c3aed',
+        label: 'LAYER_TWO',
+        icon: '02'
     },
     {
         id: 2,
-        category: '03 — Database',
-        title: 'Database Architecture',
-        description:
-            'Data integrity at scale. Designing schema structures that allow for rapid growth and millisecond queries.',
+        title: 'Quantum Strategy',
+        description: "Data persistence and algorithmic optimization strategies that redefine what's possible in real-time.",
         accent: '#f59e0b',
-        skills: ['MYSQL', 'MONGODB', 'SCHEMA OPT.'],
-        icon: (
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <ellipse cx="12" cy="5" rx="9" ry="3" />
-                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-                <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-            </svg>
-        ),
+        label: 'LAYER_THREE',
+        icon: '03'
     },
 ];
 
-// ─── Global Skills Box ─────────────────────────────────────────────────────────
-const SkillsBox = memo(() => {
-    const allSkills = Object.keys(SkillIcons);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [isHovering, setIsHovering] = useState(false);
+// ─── Sub-Components ───────────────────────────────────────────────────────────
 
-    // Advanced 3D Box Tilt
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    const mouseXSpring = useSpring(x, { stiffness: 100, damping: 25 });
-    const mouseYSpring = useSpring(y, { stiffness: 100, damping: 25 });
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["3.5deg", "-3.5deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-3.5deg", "3.5deg"]);
+const BackgroundParticles = () => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
 
-    const handleMouseMove = useCallback((e: React.MouseEvent) => {
-        if (!containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        setMousePos({
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
-        });
+    useEffect(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-        // 3D Tilt Math
-        const width = rect.width;
-        const height = rect.height;
-        const mouseXLocal = e.clientX - rect.left;
-        const mouseYLocal = e.clientY - rect.top;
-        x.set(mouseXLocal / width - 0.5);
-        y.set(mouseYLocal / height - 0.5);
-    }, [x, y]);
+        let animationFrameId: number;
+        let particles: any[] = [];
 
-    const handleMouseLeave = useCallback(() => {
-        setIsHovering(false);
-        x.set(0);
-        y.set(0);
-    }, [x, y]);
+        const resize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
 
-    return (
-        <div style={{
-            marginTop: '7rem',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            position: 'relative',
-            perspective: '1500px', // Add perspective to the parent container
-        }}>
-            <Reveal>
-                <div style={{ marginBottom: '3rem', textAlign: 'center' }}>
-                    <h3 style={{
-                        fontSize: '2rem',
-                        fontWeight: 700,
-                        color: 'var(--text-primary)',
-                        marginBottom: '1rem',
-                        letterSpacing: '-0.02em',
-                    }}>
-                        Technological Arsenal
-                    </h3>
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '1.05rem', maxWidth: '500px', margin: '0 auto', lineHeight: 1.6 }}>
-                        The core suite of tools, languages, and frameworks I leverage to architect and deploy modern digital solutions.
-                    </p>
-                </div>
+        const createParticles = () => {
+            particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    size: Math.random() * 2,
+                    color: Math.random() > 0.5 ? 'rgba(0, 245, 255, 0.08)' : 'rgba(124, 58, 237, 0.08)'
+                });
+            }
+        };
+
+        const animate = () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) p.x = canvas.width;
+                if (p.x > canvas.width) p.x = 0;
+                if (p.y < 0) p.y = canvas.height;
+                if (p.y > canvas.height) p.y = 0;
                 
-                <motion.div
-                    ref={containerRef}
-                    onMouseMove={handleMouseMove}
-                    onMouseEnter={() => setIsHovering(true)}
-                    onMouseLeave={handleMouseLeave}
-                    initial={{ opacity: 0, scale: 0.95, y: 40 }}
-                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                    style={{
-                        rotateX,
-                        rotateY,
-                        background: 'var(--bg-secondary)',
-                        border: '1px solid var(--border-color)',
-                        borderRadius: '24px',
-                        padding: '4rem 3rem',
-                        position: 'relative',
-                        overflow: 'hidden',
-                        boxShadow: '0 20px 60px -15px rgba(0,0,0,0.5)',
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: '2.5rem',
-                        width: '100%',
-                        margin: '0 auto'
-                    }}
-                >
-                    {/* Advanced ambient atmospheric glow */}
-                    <div style={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: '120%',
-                        height: '120%',
-                        background: 'radial-gradient(circle at center, rgba(167,139,250,0.03) 0%, transparent 60%)',
-                        pointerEvents: 'none',
-                        zIndex: 0,
-                    }} />
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fillStyle = p.color;
+                ctx.fill();
 
-                    {/* Dynamic Mouse Tracking Light */}
-                    <motion.div
-                        animate={{
-                            opacity: isHovering ? 1 : 0,
-                            x: mousePos.x - 400,
-                            y: mousePos.y - 400,
-                        }}
-                        transition={{ type: 'tween', ease: 'backOut', duration: 0.3 }}
-                        style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: 0,
-                            width: '800px',
-                            height: '800px',
-                            background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 50%)',
-                            pointerEvents: 'none',
-                            zIndex: 0,
-                            borderRadius: '50%',
-                        }}
-                    />
+                // Connect nearby particles
+                particles.forEach(p2 => {
+                    const dx = p.x - p2.x;
+                    const dy = p.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.strokeStyle = `rgba(0, 245, 255, ${0.03 * (1 - dist/100)})`;
+                        ctx.stroke();
+                    }
+                });
+            });
+            animationFrameId = requestAnimationFrame(animate);
+        };
 
-                    {allSkills.map((skill, i) => {
-                        const entry = SkillIcons[skill];
-                        if (!entry) return null;
-                        
-                        // Professional Subtle Floating
-                        const dur = 5 + (i % 4); 
-                        const yFloat = (i % 2 === 0) ? -6 : 6;
-                        
-                        return (
-                            <motion.div
-                                key={skill}
-                                initial={{ opacity: 0, scale: 0.8, filter: 'blur(10px)' }}
-                                whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                                viewport={{ once: true, margin: '-50px' }}
-                                transition={{
-                                    duration: 0.6,
-                                    delay: i * 0.04,
-                                    type: 'spring',
-                                    stiffness: 100,
-                                    damping: 12
-                                }}
-                                whileHover={{ 
-                                    scale: 1.15, 
-                                    zIndex: 10,
-                                }}
-                                style={{
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    gap: '1rem',
-                                    position: 'relative',
-                                    zIndex: 1,
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                {/* Advanced continuous hovering & elastic drag animation */}
-                                <motion.div
-                                    drag
-                                    dragConstraints={{ top: 0, bottom: 0, left: 0, right: 0 }}
-                                    dragElastic={0.2}
-                                    dragTransition={{ bounceStiffness: 600, bounceDamping: 20 }}
-                                    whileTap={{ cursor: "grabbing", scale: 0.95 }}
-                                    animate={{ 
-                                       y: [0, yFloat, 0]
-                                    }}
-                                    transition={{
-                                        duration: dur,
-                                        repeat: Infinity,
-                                        ease: "easeInOut",
-                                        delay: (i % 5) * 0.5,
-                                    }}
-                                    style={{
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        position: 'relative',
-                                    }}
-                                >
-                                    {/* Icon container with theme match perfectly emulating FeatureCards */}
-                                    <motion.div 
-                                        style={{ 
-                                            position: 'relative', 
-                                            display: 'flex', 
-                                            alignItems: 'center', 
-                                            justifyContent: 'center',
-                                            width: '68px',
-                                            height: '68px',
-                                            borderRadius: '16px',
-                                            background: 'rgba(255,255,255,0.02)',
-                                            border: '1px solid rgba(255,255,255,0.04)',
-                                            transition: 'background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s',
-                                        }}
-                                        whileHover={{
-                                            background: `${entry.color}16`,
-                                            borderColor: `${entry.color}35`,
-                                            boxShadow: `0 10px 25px -10px ${entry.color}60`,
-                                        }}
-                                    >
-                                        <div style={{ color: entry.color }}>
-                                            {entry.icon}
-                                        </div>
-                                    </motion.div>
-                                </motion.div>
-                                    
-                                <motion.span
-                                    style={{
-                                        fontSize: '0.7rem',
-                                        letterSpacing: '0.15em',
-                                        textTransform: 'uppercase',
-                                        color: 'var(--text-secondary)',
-                                        fontWeight: 700,
-                                        textAlign: 'center',
-                                        whiteSpace: 'nowrap',
-                                        transition: 'color 0.3s ease',
-                                    }}
-                                    whileHover={{ color: entry.color }}
-                                >
-                                    {skill}
-                                </motion.span>
-                            </motion.div>
-                        );
-                    })}
-                </motion.div>
-            </Reveal>
-        </div>
-    );
-});
+        resize();
+        createParticles();
+        animate();
+        window.addEventListener('resize', resize);
+        return () => {
+            cancelAnimationFrame(animationFrameId);
+            window.removeEventListener('resize', resize);
+        };
+    }, []);
 
-// ─── Feature Card ──────────────────────────────────────────────────────────────
-const FeatureCard = memo(({ card, index }: { card: typeof cards[0]; index: number }) => {
-    const [hovered, setHovered] = useState(false);
+    return <canvas ref={canvasRef} style={{ position: 'absolute', inset: 0, pointerEvents: 'none', mixBlendMode: 'plus-lighter' }} />;
+};
 
-    // Advanced 3D Tilt Effect
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-    const mouseXSpring = useSpring(x, { stiffness: 150, damping: 20 });
-    const mouseYSpring = useSpring(y, { stiffness: 150, damping: 20 });
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+const SkillNode = memo(({ skill, entry, isActive, isConnected, onHover }: any) => {
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const springX = useSpring(mouseX, { stiffness: 300, damping: 30 });
+    const springY = useSpring(mouseY, { stiffness: 300, damping: 30 });
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = (e: React.MouseEvent) => {
         const rect = e.currentTarget.getBoundingClientRect();
-        const width = rect.width;
-        const height = rect.height;
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        x.set(mouseX / width - 0.5);
-        y.set(mouseY / height - 0.5);
-    };
-
-    const handleMouseLeave = () => {
-        setHovered(false);
-        x.set(0);
-        y.set(0);
+        mouseX.set((e.clientX - (rect.left + rect.width / 2)) * 0.4);
+        mouseY.set((e.clientY - (rect.top + rect.height / 2)) * 0.4);
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5, delay: index * 0.12 }}
-            onHoverStart={() => setHovered(true)}
             onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            style={{ 
-                flex: '1 1 0', 
-                minWidth: '260px',
-                perspective: '1200px'
-            }}
+            onMouseLeave={() => { mouseX.set(0); mouseY.set(0); onHover(null); }}
+            onMouseEnter={() => onHover(skill)}
+            style={{ x: springX, y: springY, position: 'relative', cursor: 'pointer', zIndex: isActive ? 50 : 1 }}
         >
+            <AnimatePresence>
+                {isActive && (
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.8, y: -20 }}
+                        animate={{ opacity: 1, scale: 1, y: -50 }}
+                        exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                        style={{
+                            position: 'absolute', left: '50%', x: '-50%',
+                            padding: '4px 12px', background: 'rgba(0, 0, 0, 0.8)',
+                            border: `1px solid ${entry.color}`, borderRadius: '4px',
+                            fontSize: '0.5rem', fontWeight: 900, color: entry.color,
+                            whiteSpace: 'nowrap', backdropFilter: 'blur(10px)',
+                            textShadow: `0 0 10px ${entry.color}`, pointerEvents: 'none'
+                        }}
+                    >
+                        [ SYSTEM_REVEAL: {Math.floor(Math.random() * 20 + 80)}%_OP ]
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <motion.div
                 animate={{
-                    borderColor: hovered ? `${card.accent}55` : 'var(--border-color)',
-                    boxShadow: hovered
-                        ? `0 20px 60px -15px ${card.accent}20`
-                        : '0 0 0 transparent',
-                    y: hovered ? -4 : 0,
+                    borderColor: isActive ? entry.color : (isConnected ? `${entry.color}80` : 'rgba(255,255,255,0.05)'),
+                    scale: isActive ? 1.15 : (isConnected ? 1.05 : 1),
+                    background: isActive ? `${entry.color}15` : 'rgba(10, 10, 12, 0.6)',
+                    rotateY: isActive ? 20 : 0,
+                    rotateX: isActive ? -20 : 0,
+                    boxShadow: isActive ? `0 0 40px ${entry.color}40, inset 0 0 20px ${entry.color}20` : 'none',
                 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 style={{
-                    rotateX,
-                    rotateY,
-                    background: 'var(--bg-secondary)',
-                    border: '1px solid var(--border-color)',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    overflow: 'hidden',
-                    boxSizing: 'border-box',
+                    width: 76, height: 76, borderRadius: '22px',
+                    border: '1px solid', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    backdropFilter: 'blur(20px)', position: 'relative', overflow: 'hidden'
                 }}
             >
-                {/* Accent top bar on hover */}
-                <motion.div
-                    animate={{ opacity: hovered ? 1 : 0 }}
-                    style={{
-                        position: 'absolute', top: 0, left: 0, right: 0,
-                        height: '2px',
-                        background: `linear-gradient(90deg, transparent, ${card.accent}, transparent)`,
-                        borderRadius: '16px 16px 0 0',
-                    }}
-                />
-
-                {/* Glow blob */}
-                <motion.div
-                    animate={{ opacity: hovered ? 1 : 0 }}
-                    style={{
-                        position: 'absolute', top: '-28px', right: '-28px',
-                        width: '110px', height: '110px',
-                        background: `radial-gradient(circle, ${card.accent}18, transparent 70%)`,
-                        borderRadius: '50%', pointerEvents: 'none',
-                    }}
-                />
-
-                {/* Category badge */}
-                <div style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    padding: '3px 10px', borderRadius: '20px',
-                    background: `${card.accent}14`,
-                    border: `1px solid ${card.accent}30`,
-                    marginBottom: '1.5rem', width: 'fit-content',
-                }}>
-                    <span style={{
-                        width: '5px', height: '5px', borderRadius: '50%',
-                        background: card.accent,
-                        boxShadow: `0 0 6px ${card.accent}`,
-                        display: 'block',
-                    }} />
-                    <span style={{
-                        fontSize: '0.6rem', letterSpacing: '0.12em',
-                        textTransform: 'uppercase', color: card.accent, fontWeight: 600,
-                    }}>{card.category}</span>
+                {/* Holographic Scanline */}
+                {isActive && (
+                    <motion.div
+                        initial={{ y: -80 }}
+                        animate={{ y: 80 }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: 'linear' }}
+                        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '2px', background: `linear-gradient(90deg, transparent, ${entry.color}, transparent)`, opacity: 0.5 }}
+                    />
+                )}
+                
+                <div style={{ color: isActive ? '#fff' : (isConnected ? `${entry.color}` : `${entry.color}cc`), transition: 'all 0.4s', filter: isActive ? `drop-shadow(0 0 12px ${entry.color})` : 'none' }}>
+                    {entry.icon}
                 </div>
-
-                {/* Icon */}
-                <motion.div
-                    animate={{
-                        color: hovered ? card.accent : 'var(--text-dim)',
-                        y: hovered ? -2 : 0,
-                    }}
-                    transition={{ duration: 0.25 }}
-                    style={{
-                        width: '52px', height: '52px', borderRadius: '12px',
-                        background: hovered ? `${card.accent}16` : 'rgba(255,255,255,0.04)',
-                        border: `1px solid ${hovered ? card.accent + '35' : 'rgba(255,255,255,0.07)'}`,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        marginBottom: '1.5rem',
-                        transition: 'background 0.3s, border 0.3s',
-                    }}
-                >
-                    {card.icon}
-                </motion.div>
-
-                {/* Title */}
-                <h3 style={{
-                    fontSize: '1.15rem', fontWeight: 700,
-                    color: 'var(--text-primary)', marginBottom: '0.65rem',
-                    lineHeight: 1.25,
-                }}>{card.title}</h3>
-
-                {/* Description */}
-                <p style={{
-                    fontSize: '0.875rem', color: 'var(--text-secondary)',
-                    lineHeight: 1.75,
-                }}>{card.description}</p>
-
             </motion.div>
+            
+            <motion.span
+                animate={{ 
+                    opacity: isActive ? 1 : 0.9, 
+                    y: isActive ? 8 : 0,
+                    color: isActive ? '#fff' : (isConnected ? entry.color : '#fff'),
+                    scale: isActive ? 1.25 : 1,
+                    textShadow: isActive ? `0 0 15px ${entry.color}` : 'none'
+                }}
+                style={{
+                    position: 'absolute', bottom: -32, left: '50%', x: '-50%',
+                    fontSize: '1rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '1px',
+                    whiteSpace: 'nowrap', transition: 'all 0.4s'
+                }}
+            >
+                {skill}
+            </motion.span>
         </motion.div>
     );
 });
 
-// ─── Feature Section ───────────────────────────────────────────────────────────
+const ConnectionLayer = ({ nodeCoords, hoveredSkill }: any) => {
+    return (
+        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }}>
+            <defs>
+                <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+                <linearGradient id="lineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="transparent" />
+                    <stop offset="50%" stopColor="white" />
+                    <stop offset="100%" stopColor="transparent" />
+                </linearGradient>
+            </defs>
+            {SKILL_CONNECTIONS.map((conn, i) => {
+                const from = nodeCoords[conn.from];
+                const to = nodeCoords[conn.to];
+                if (!from || !to) return null;
+
+                const isDirectlyActive = hoveredSkill === conn.from || hoveredSkill === conn.to;
+                // Propagate activity: if any connected node is hovered
+                const isActive = isDirectlyActive;
+                const color = conn.color;
+
+                const dx = to.x - from.x;
+                const dy = to.y - from.y;
+                const path = `M ${from.x} ${from.y} C ${from.x + dx/2} ${from.y}, ${from.x + dx/2} ${to.y}, ${to.x} ${to.y}`;
+
+                return (
+                    <g key={i}>
+                        <motion.path
+                            d={path}
+                            fill="none"
+                            stroke={color}
+                            strokeWidth="1.5"
+                            initial={{ pathLength: 0, opacity: 0 }}
+                            animate={{ 
+                                pathLength: 1, 
+                                opacity: isActive ? 1 : 0.12,
+                                strokeWidth: isActive ? 4 : 1.5
+                            }}
+                            transition={{ duration: 0.8, ease: "easeOut" }}
+                        />
+                        {/* Animated Data Packets */}
+                        <motion.path
+                            d={path}
+                            fill="none"
+                            stroke={color}
+                            strokeWidth="4"
+                            strokeDasharray="2, 60"
+                            strokeLinecap="round"
+                            initial={{ strokeDashoffset: 100 }}
+                            animate={{ strokeDashoffset: -100 }}
+                            transition={{ duration: isActive ? 1.5 : 4, repeat: Infinity, ease: 'linear' }}
+                            style={{ 
+                                filter: isActive ? 'url(#glow)' : 'none', 
+                                opacity: isActive ? 1 : 0.2,
+                                strokeWidth: isActive ? 5 : 2
+                            }}
+                        />
+                        {/* High-speed flare */}
+                        {isActive && (
+                            <motion.path
+                                d={path}
+                                fill="none"
+                                stroke="rgba(255,255,255,0.8)"
+                                strokeWidth="1"
+                                strokeDasharray="1, 200"
+                                initial={{ strokeDashoffset: 200 }}
+                                animate={{ strokeDashoffset: -200 }}
+                                transition={{ duration: 0.8, repeat: Infinity, ease: 'circOut' }}
+                            />
+                        )}
+                    </g>
+                );
+            })}
+        </svg>
+    );
+};
+
 const FeatureSection = memo(() => {
-    const { scrollYProgress, scrollY } = useScroll();
-    const x = useTransform(scrollYProgress, [0, 1], ['100%', '-100%']);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [hoveredSkill, setHoveredSkill] = useState<string | null>(null);
+    const [nodeCoords, setNodeCoords] = useState<Record<string, { x: number; y: number }>>({});
+    const nodeRefs = useRef<Record<string, any>>({});
+
+    const updateCoords = useCallback(() => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const newCoords: any = {};
+        Object.entries(nodeRefs.current).forEach(([id, el]) => {
+            if (el) {
+                const elRect = el.getBoundingClientRect();
+                newCoords[id] = {
+                    x: elRect.left - rect.left + elRect.width / 2,
+                    y: elRect.top - rect.top + elRect.height / 2
+                };
+            }
+        });
+        setNodeCoords(newCoords);
+    }, []);
+
+    useEffect(() => {
+        updateCoords();
+        window.addEventListener('resize', updateCoords);
+        return () => window.removeEventListener('resize', updateCoords);
+    }, [updateCoords]);
+
+    const { scrollYProgress } = useScroll();
+    const bgTextX = useTransform(scrollYProgress, [0, 1], ['0%', '-30%']);
     
-    // Advanced Scroll Velocity Parallax
-    const scrollVelocity = useVelocity(scrollY);
-    const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
-    const skewVelocity = useTransform(smoothVelocity, [-1000, 1000], [-15, 15]);
-    const skewX = useTransform(skewVelocity, (v) => `${v}deg`);
+    // Advanced 3D Mouse Parallax
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    const springX = useSpring(mouseX, { stiffness: 50, damping: 30 });
+    const springY = useSpring(mouseY, { stiffness: 50, damping: 30 });
+    
+    const rotateX = useTransform(springY, [-500, 500], [8, -8]);
+    const rotateY = useTransform(springX, [-500, 500], [-8, 8]);
+
+    const handleContainerMouseMove = (e: React.MouseEvent) => {
+        if (!containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        mouseX.set(e.clientX - (rect.left + rect.width / 2));
+        mouseY.set(e.clientY - (rect.top + rect.height / 2));
+    };
+
+    const handleContainerMouseLeave = () => {
+        mouseX.set(0);
+        mouseY.set(0);
+    };
+
+    const skillGroups = [
+        { name: 'Frontend Layer', skills: ['HTML', 'CSS', 'JS', 'TS', 'REACT'] },
+        { name: 'Backend Engine', skills: ['PHP', 'LARAVEL', 'NODE', 'EXPRESS'] },
+        { name: 'Data Vault', skills: ['MYSQL', 'POSTGRES', 'MONGODB', 'REDIS'] },
+        { name: 'Infrastructure & Server', skills: ['GIT', 'NGINX', 'DOCKER', 'LINUX'] },
+    ];
+
+    const isConnected = (s1: string, s2: string) => SKILL_CONNECTIONS.some(c => (c.from === s1 && c.to === s2) || (c.from === s2 && c.to === s1));
 
     return (
-        <section className="section-padding" style={{ background: 'var(--bg-primary)', overflow: 'hidden' }}>
-            <div className="container">
-                <Reveal>
-                    <div style={{ maxWidth: '600px', marginBottom: '4rem' }}>
-                        <h2 style={{
-                            fontSize: '2.5rem', lineHeight: '1.1',
-                            marginBottom: '1.5rem', color: 'var(--text-primary)',
-                        }}>
-                            Architectural Layers
-                        </h2>
-                        <p style={{ fontSize: '1rem', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
-                            A multi-tiered approach to software engineering, ensuring every component —
-                            from the user interface to the database schema — is optimised for speed and reliability.
-                        </p>
-                    </div>
-                </Reveal>
+        <section style={{ backgroundColor: '#050507', padding: '180px 0', overflow: 'hidden', position: 'relative' }}>
+            <BackgroundParticles />
+            
+            {/* Top Spotlight */}
+            <div style={{ position: 'absolute', top: '-20%', left: '50%', x: '-50%', width: '1000px', height: '600px', background: 'radial-gradient(ellipse at center, rgba(0,245,255,0.03) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
-                {/* 3-card full-width flex row */}
-                <div style={{ display: 'flex', gap: '1.75rem', alignItems: 'stretch', flexWrap: 'wrap' }}>
+            <div className="container" style={{ position: 'relative', zIndex: 1 }}>
+                <div style={{ textAlign: 'center', marginBottom: '8rem' }}>
+                    <Reveal>
+                        <motion.div
+                            animate={{ letterSpacing: ['0.4em', '0.6em', '0.4em'] }}
+                            transition={{ duration: 4, repeat: Infinity }}
+                            style={{ fontSize: '0.75rem', fontWeight: 900, color: '#00f5ff', textTransform: 'uppercase', marginBottom: '2rem' }}
+                        >
+                            [ TECHNICAL_ARCHITECTURE_V3.0 ]
+                        </motion.div>
+                        <h2 style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', fontWeight: 900, color: '#fff', lineHeight: 0.85, letterSpacing: '-0.04em' }}>
+                            A Stack Built for <br /> <span style={{ color: '#00f5ff' }}>Extreme Scale.</span>
+                        </h2>
+                    </Reveal>
+                </div>
+
+                {/* 3D Feature Grid */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem', marginBottom: '10rem' }}>
                     {cards.map((card, i) => (
-                        <FeatureCard key={card.id} card={card} index={i} />
+                        <Reveal key={i} delay={i * 0.1}>
+                            <motion.div
+                                whileHover={{ y: -10 }}
+                                style={{
+                                    padding: '4rem 3rem', borderRadius: '40px',
+                                    background: 'rgba(255,255,255,0.01)',
+                                    border: '1px solid rgba(255,255,255,0.03)',
+                                    backdropFilter: 'blur(40px)', position: 'relative', overflow: 'hidden'
+                                }}
+                            >
+                                <div style={{ fontSize: '3rem', fontWeight: 900, opacity: 0.05, position: 'absolute', top: '10%', right: '10%', color: card.accent }}>{card.icon}</div>
+                                <div style={{ fontSize: '0.6rem', fontWeight: 900, color: card.accent, letterSpacing: '4px', marginBottom: '1.5rem' }}>{card.label}</div>
+                                <h3 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: '1.2rem' }}>{card.title}</h3>
+                                <p style={{ fontSize: '1.05rem', color: '#777', lineHeight: 1.6 }}>{card.description}</p>
+                                <motion.div style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: '2px', background: `linear-gradient(90deg, transparent, ${card.accent}, transparent)` }} />
+                            </motion.div>
+                        </Reveal>
                     ))}
                 </div>
-            </div>
 
-            <div style={{ padding: '0 2vw', width: '100%', margin: '0 auto', maxWidth: '1920px' }}>
-                <SkillsBox />
-            </div>
-
-            {/* Decorative background text */}
-            <div style={{
-                position: 'relative', width: '100%',
-                marginTop: '-30px', pointerEvents: 'none', overflow: 'hidden',
-            }}>
-                <motion.span
+                {/* Neural Connectivity Visualizer */}
+                <motion.div
+                    ref={containerRef}
+                    onMouseMove={handleContainerMouseMove}
+                    onMouseLeave={handleContainerMouseLeave}
                     style={{
-                        x, skewX, display: 'block',
-                        fontSize: '12rem', fontWeight: 900,
-                        color: 'rgba(255,255,255,0.02)',
-                        letterSpacing: '-20px',
-                        fontFamily: 'var(--font-heading)',
-                        whiteSpace: 'nowrap',
+                        position: 'relative', padding: '12rem 4rem',
+                        background: 'radial-gradient(circle at 50% 50%, rgba(0, 245, 255, 0.02) 0%, transparent 70%)',
+                        borderRadius: '60px', border: '1px solid rgba(255,255,255,0.03)',
+                        boxShadow: '0 80px 150px -40px rgba(0,0,0,0.8)',
+                        rotateX: rotateX,
+                        rotateY: rotateY,
+                        transformStyle: 'preserve-3d',
+                        perspective: '1200px'
                     }}
                 >
-                    01//STACK
-                </motion.span>
+                    <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
+                    <ConnectionLayer nodeCoords={nodeCoords} hoveredSkill={hoveredSkill} />
+                    
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10rem' }}>
+                        {skillGroups.map((group, gi) => (
+                            <motion.div 
+                                key={gi} 
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: gi * 0.1 }}
+                                style={{ 
+                                    position: 'relative',
+                                    padding: '6rem 3rem 4rem',
+                                    background: 'rgba(255,255,255,0.015)',
+                                    borderRadius: '40px',
+                                    border: '1px solid rgba(255,255,255,0.05)',
+                                    backdropFilter: 'blur(20px)',
+                                    boxShadow: 'inset 0 0 50px rgba(0,0,0,0.2)'
+                                }}
+                            >
+                                {/* Group Heading Wrapper */}
+                                <motion.div style={{ 
+                                    position: 'absolute', top: 0, left: '50%', x: '-50%', y: '-50%',
+                                    padding: '10px 40px', background: '#050507',
+                                    border: '1px solid rgba(255,255,255,0.15)', borderRadius: '15px',
+                                    zIndex: 20, boxShadow: '0 0 40px rgba(0,245,255,0.1)'
+                                }}>
+                                    <motion.div 
+                                        initial={{ opacity: 0, scale: 0.9 }}
+                                        whileInView={{ opacity: 1, scale: 1 }}
+                                        viewport={{ once: true }}
+                                        style={{ 
+                                            fontSize: '1rem', fontWeight: 900, color: '#fff',
+                                            letterSpacing: '0.6em', textTransform: 'uppercase', whiteSpace: 'nowrap',
+                                            textShadow: '0 0 20px rgba(0,245,255,0.5)',
+                                        }}
+                                    >
+                                        {group.name}
+                                    </motion.div>
+                                </motion.div>
+
+                                <div style={{ display: 'flex', justifyContent: 'center', gap: '5rem', flexWrap: 'wrap', zIndex: 1 }}>
+                                    {group.skills.map((skill) => {
+                                        const entry = SkillIcons[skill];
+                                        if (!entry) return null;
+                                        const isActive = hoveredSkill === skill;
+                                        const isConnectedToActive = hoveredSkill && isConnected(hoveredSkill, skill);
+                                        
+                                        return (
+                                            <div key={skill} ref={el => nodeRefs.current[skill] = el}>
+                                                <SkillNode 
+                                                    skill={skill} 
+                                                    entry={entry} 
+                                                    isActive={isActive} 
+                                                    isConnected={isConnectedToActive}
+                                                    onHover={setHoveredSkill}
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.div>
+            </div>
+
+            {/* Hyper-Drammatic Background Text */}
+            <div style={{ position: 'absolute', bottom: '-5%', left: 0, width: '200%', pointerEvents: 'none', mixBlendMode: 'overlay' }}>
+                <motion.div style={{ x: bgTextX, display: 'flex', gap: '10vw' }}>
+                    {[1, 2].map(i => (
+                        <span key={i} style={{ fontSize: '30rem', fontWeight: 900, color: 'rgba(255,255,255,0.015)', whiteSpace: 'nowrap', letterSpacing: '-0.04em' }}>
+                            SYSTEM ARCHITECTURE SYSTEM ARCHITECTURE
+                        </span>
+                    ))}
+                </motion.div>
             </div>
         </section>
     );
