@@ -38,6 +38,8 @@ const CaseStudySection = memo(() => {
                             <img 
                                 src="/dashboard.png" 
                                 alt="Astra Enterprise Platform" 
+                                loading="lazy"
+                                decoding="async"
                                 style={{ width: '100%', borderRadius: '6px', opacity: 0.9 }}
                             />
                             {/* Scanning Sweep Mask */}
