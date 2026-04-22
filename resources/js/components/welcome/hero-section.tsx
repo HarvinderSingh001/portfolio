@@ -6,7 +6,7 @@ import { portfolioData } from '../../data/portfolio';
 
 const HeroSection = memo(() => {
     const containerVariants = {
-        hidden: { opacity: 0 },
+        hidden: { opacity: 1 },
         visible: {
             opacity: 1,
             transition: {
@@ -126,8 +126,7 @@ const HeroSection = memo(() => {
                         />
                     </h1>
                     
-                    <motion.p 
-                        variants={itemVariants}
+                    <p 
                         style={{ 
                             fontSize: '1.15rem', 
                             color: 'var(--text-secondary)', 
@@ -137,7 +136,7 @@ const HeroSection = memo(() => {
                         }}
                     >
                         {portfolioData.hero.description}
-                    </motion.p>
+                    </p>
                     
                     <motion.div variants={itemVariants} style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
                         <Magnetic>
