@@ -7,6 +7,14 @@ export const portfolioData = {
     email: "harvinderynr2001@gmail.com", // Replace with your email
     resumeLink: "/resume.pdf",
 
+    // SEO Data
+    seo: {
+        title: "Harvinder Singh | Full-Stack Developer",
+        description: "Portfolio of Harvinder Singh, a Full-Stack Developer specializing in robust Laravel backends, modern React/Livewire frontends, and seamless API integrations.",
+        keywords: "Harvinder Singh, Full-Stack Developer, Laravel Developer, React Developer, Node.js, Web Development, PHP, JavaScript, Portfolio, Enterprise Solutions, Software Engineer",
+        canonicalUrl: "https://harrydev.site/"
+    },
+
     // Navbar & Footer Navigation
     navItems: ['Skills', 'Projects', 'Experience', 'Contact'],
     socialLinks: [
