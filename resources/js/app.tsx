@@ -6,10 +6,12 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import '../css/app.css';
 import { initializeTheme } from '@/hooks/use-appearance';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+import { portfolioData } from './data/portfolio';
+
+const appName = import.meta.env.VITE_APP_NAME || portfolioData.name;
 
 createInertiaApp({
-    title: (title) => (title ? `${title} - ${appName}` : appName),
+    title: (title) => (title ? title : `${portfolioData.name} | ${portfolioData.role}`),
     resolve: (name) =>
         resolvePageComponent(
             `./pages/${name}.tsx`,

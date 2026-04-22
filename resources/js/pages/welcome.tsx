@@ -33,8 +33,7 @@ export default function Welcome() {
             className="portfolio-wrapper" 
             style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh', position: 'relative' }}
         >
-            <Head>
-                <title>{`${portfolioData.name} | ${portfolioData.role}`}</title>
+            <Head title={`${portfolioData.name} | ${portfolioData.role}`}>
                 <meta name="description" content={portfolioData.seo.description || portfolioData.hero.description} />
                 <meta name="keywords" content={portfolioData.seo.keywords} />
                 <meta property="og:title" content={`${portfolioData.name} | ${portfolioData.role}`} />

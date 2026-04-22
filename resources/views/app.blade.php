@@ -6,8 +6,8 @@
 
         <!-- Primary Meta Tags (SEO Optimization) -->
         <meta name="title" content="Harvinder Singh | Full-Stack Developer">
-        <meta name="description" content="Portfolio of Harvinder Singh, Full-Stack Developer specializing in Laravel, React, Livewire, and Scalable Enterprise Solutions.">
-        <meta name="keywords" content="Harvinder Singh, Full-Stack Developer, Laravel Developer, React Developer, Web Developer, Portfolio, Software Engineer">
+        <meta name="description" content="Portfolio of Harvinder Singh, a Full-Stack Developer specializing in robust Laravel backends, modern React/Livewire frontends, and seamless API integrations.">
+        <meta name="keywords" content="Harvinder Singh, Full-Stack Developer, Laravel Developer, React Developer, Node.js, Web Development, PHP, JavaScript, Portfolio, Enterprise Solutions, Software Engineer">
         <meta name="author" content="Harvinder Singh">
         <meta name="robots" content="index, follow">
 
@@ -15,7 +15,7 @@
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ url()->current() }}">
         <meta property="og:title" content="Harvinder Singh | Full-Stack Developer">
-        <meta property="og:description" content="Portfolio of Harvinder Singh, Full-Stack Developer specializing in Laravel, React, and seamless API integrations. View my work and skills.">
+        <meta property="og:description" content="Portfolio of Harvinder Singh, a Full-Stack Developer specializing in robust Laravel backends, modern React/Livewire frontends, and seamless API integrations.">
         <!-- Make sure to place an actual image at public/og-image.png for this to work -->
         <meta property="og:image" content="{{ asset('/og-image.png') }}">
 
@@ -23,7 +23,7 @@
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:url" content="{{ url()->current() }}">
         <meta property="twitter:title" content="Harvinder Singh | Full-Stack Developer">
-        <meta property="twitter:description" content="Portfolio of Harvinder Singh, Full-Stack Developer specializing in Laravel, React, and seamless API integrations.">
+        <meta property="twitter:description" content="Portfolio of Harvinder Singh, a Full-Stack Developer specializing in robust Laravel backends, modern React/Livewire frontends, and seamless API integrations.">
         <!-- Make sure to place an actual image at public/twitter-image.png for this to work -->
         <meta property="twitter:image" content="{{ asset('/og-image.png') }}">
 
@@ -60,7 +60,7 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>Harvinder Singh | Full-Stack Developer</title>
 
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 
