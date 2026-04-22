@@ -1,5 +1,4 @@
 User-agent: *
 Disallow: /dashboard
-Allow: /
 
 Sitemap: https://harrydev.site/sitemap.xml
