@@ -5,9 +5,10 @@ interface Props {
   children: React.ReactNode;
   width?: "fit-content" | "100%";
   delay?: number;
+  fullHeight?: boolean;
 }
 
-export const Reveal = ({ children, width = "100%", delay = 0.25 }: Props) => {
+export const Reveal = ({ children, width = "100%", delay = 0.25, fullHeight }: Props) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   
@@ -22,7 +23,7 @@ export const Reveal = ({ children, width = "100%", delay = 0.25 }: Props) => {
   }, [isInView, mainControls, slideControls]);
 
   return (
-    <div ref={ref} style={{ position: "relative", width, overflow: "hidden" }}>
+    <div ref={ref} style={{ position: "relative", width, overflow: "hidden", height: fullHeight ? "100%" : "auto" }}>
       <motion.div
         variants={{
           hidden: { opacity: 0, y: 75 },
@@ -31,6 +32,7 @@ export const Reveal = ({ children, width = "100%", delay = 0.25 }: Props) => {
         initial="hidden"
         animate={mainControls}
         transition={{ duration: 0.5, delay }}
+        style={{ height: fullHeight ? "100%" : "auto" }}
       >
         {children}
       </motion.div>

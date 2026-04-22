@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Reveal } from '../motion/Reveal';
+import { portfolioData } from '../../data/portfolio';
 
 const StatBox = memo(({ label, value, index }: any) => {
     return (
@@ -85,28 +86,25 @@ const StatsSection = memo(() => {
                     pointerEvents: 'none',
                     letterSpacing: '-0.05em'
                 }}
-            >SYSX</motion.div>
+            >{portfolioData.stats.bgText}</motion.div>
             
             <div className="container">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '4rem', alignItems: 'center' }}>
                     
                     <div>
                         <Reveal>
-                            <h2 style={{ fontSize: '3.5rem', marginBottom: '1.5rem', lineHeight: '1.1' }}>Bridging<br />Complexity</h2>
+                            <h2 style={{ fontSize: '3.5rem', marginBottom: '1.5rem', lineHeight: '1.1' }}>{portfolioData.stats.heading1}<br />{portfolioData.stats.heading2}</h2>
                         </Reveal>
                         <Reveal delay={0.4}>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '3rem' }}>
-                                Software is the infrastructure of modern business. We treat code with the 
-                                same precision as physical construction, ensuring every system is scalable, 
-                                maintainable, and built for the long term.
+                                {portfolioData.stats.description}
                             </p>
                         </Reveal>
                         
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                            <StatBox index={0} label="API EFFICIENCY" value="99.9%" />
-                            <StatBox index={1} label="DB SCHEMA OPT." value="85+" />
-                            <StatBox index={2} label="LATENCY REDUCTION" value="12ms" />
-                            <StatBox index={3} label="SCALABILITY" value="∞" />
+                            {portfolioData.stats.metrics.map((metric, idx) => (
+                                <StatBox key={idx} index={idx} label={metric.label} value={metric.value} />
+                            ))}
                         </div>
                     </div>
                     
@@ -131,7 +129,7 @@ const StatsSection = memo(() => {
                             <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ff5f56' }}></div>
                             <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ffbd2e' }}></div>
                             <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#27c93f' }}></div>
-                            <span style={{ fontSize: '0.65rem', color: '#445', marginLeft: '1rem' }}>zsh - architect_cli --status</span>
+                            <span style={{ fontSize: '0.65rem', color: '#445', marginLeft: '1rem' }}>{portfolioData.stats.terminal.command}</span>
                         </div>
                         
                         <div style={{ color: '#abb2bf' }}>
@@ -141,7 +139,7 @@ const StatsSection = memo(() => {
                                 transition={{ delay: 0.5 }}
                                 style={{ color: 'var(--accent-secondary)', marginBottom: '0.5rem' }}
                             >
-                                // SYSTEM_INITIALIZATION_SUCCESS
+                                {portfolioData.stats.terminal.output.initial}
                             </motion.div>
                             <motion.div 
                                 initial={{ opacity: 0 }}
@@ -149,7 +147,7 @@ const StatsSection = memo(() => {
                                 transition={{ delay: 1.0 }}
                                 style={{ color: 'var(--accent-primary)', marginBottom: '0.2rem' }}
                             >
-                                ^ architect deploy [- environment 'production' ]
+                                {portfolioData.stats.terminal.output.action}
                             </motion.div>
                             
                             <motion.div 
@@ -157,10 +155,10 @@ const StatsSection = memo(() => {
                                 whileInView={{ opacity: 1 }}
                                 transition={{ delay: 1.5, staggerChildren: 0.1 }}
                             >
-                                <div style={{ marginBottom: '0.2rem' }}>RUNTIME: Cluster_node-A1</div>
-                                <div style={{ marginBottom: '0.2rem' }}>INTEGRITY: [2849-1]</div>
-                                <div style={{ color: '#27c93f', marginBottom: '0.2rem' }}>STATUS: [READY // ACTIVE]</div>
-                                <div style={{ marginBottom: '1rem' }}>&gt; performance_optimized::true</div>
+                                <div style={{ marginBottom: '0.2rem' }}>{portfolioData.stats.terminal.output.runtime}</div>
+                                <div style={{ marginBottom: '0.2rem' }}>{portfolioData.stats.terminal.output.integrity}</div>
+                                <div style={{ color: '#27c93f', marginBottom: '0.2rem' }}>{portfolioData.stats.terminal.output.status}</div>
+                                <div style={{ marginBottom: '1rem' }}>{portfolioData.stats.terminal.output.optimized}</div>
                             </motion.div>
                             
                             <motion.hr 
@@ -176,8 +174,7 @@ const StatsSection = memo(() => {
                                 transition={{ delay: 2.5 }}
                                 style={{ fontSize: '0.75rem', lineHeight: '1.6' }}
                             >
-                                INFRASTRUCTURE AS NEW LAYER. ALL nodes responding at peak capacity. 
-                                Monitoring established. [v2.4.9]
+                                {portfolioData.stats.terminal.footer}
                             </motion.div>
                         </div>
                     </motion.div>

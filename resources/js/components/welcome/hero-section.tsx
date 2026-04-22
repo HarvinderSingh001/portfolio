@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Magnetic } from '../motion/Magnetic';
 import { RevealCharacters } from '../motion/RevealCharacters';
+import { portfolioData } from '../../data/portfolio';
 
 const HeroSection = memo(() => {
     const containerVariants = {
@@ -96,12 +97,12 @@ const HeroSection = memo(() => {
                 >
                     <motion.span variants={itemVariants} className="label-mini" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <span style={{ width: '40px', height: '1px', background: 'var(--accent-primary)' }}></span>
-                        SYSTEMS ARCHITECT v2.1
+                        {portfolioData.hero.label}
                     </motion.span>
                     
                     <div style={{ marginBottom: '1.5rem' }}>
                         <RevealCharacters 
-                            text="Architecting the" 
+                            text={portfolioData.hero.heading1} 
                             style={{ 
                                 fontSize: 'clamp(3rem, 10vw, 5.5rem)', 
                                 lineHeight: '1', 
@@ -112,7 +113,7 @@ const HeroSection = memo(() => {
                             }} 
                         />
                         <RevealCharacters 
-                            text="Digital Age" 
+                            text={portfolioData.hero.heading2} 
                             delay={0.6}
                             style={{ 
                                 fontSize: 'clamp(3rem, 10vw, 5.5rem)', 
@@ -135,29 +136,28 @@ const HeroSection = memo(() => {
                             lineHeight: '1.8'
                         }}
                     >
-                        Specializing in end-to-end digital structures and scalable backend systems. 
-                        We transform complex requirements into resilient, high-performance software infrastructure.
+                        {portfolioData.hero.description}
                     </motion.p>
                     
                     <motion.div variants={itemVariants} style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap' }}>
                         <Magnetic>
                             <motion.a 
                                 whileTap={{ scale: 0.98 }}
-                                href="#projects" 
+                                href={portfolioData.hero.primaryButtonLink} 
                                 className="btn btn-primary" 
                                 style={{ padding: '1rem 2rem' }}
                             >
-                                Initiate Project Discussion
+                                {portfolioData.hero.primaryButtonText}
                             </motion.a>
                         </Magnetic>
                         <Magnetic>
                             <motion.a 
                                 whileTap={{ scale: 0.98 }}
-                                href="#blueprint" 
+                                href={portfolioData.hero.secondaryButtonLink} 
                                 className="btn btn-outline" 
                                 style={{ padding: '1rem 2rem', background: 'rgba(255, 255, 255, 0.03)' }}
                             >
-                                View Blueprint
+                                {portfolioData.hero.secondaryButtonText}
                             </motion.a>
                         </Magnetic>
                     </motion.div>
@@ -181,7 +181,7 @@ const HeroSection = memo(() => {
                     opacity: 0.5
                 }}
             >
-                LATENCY: 12ms | SCANNING: OK | ESTABLISHED
+                {portfolioData.hero.sideText}
             </motion.div>
         </section>
     );

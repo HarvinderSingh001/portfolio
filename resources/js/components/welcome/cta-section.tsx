@@ -2,6 +2,7 @@ import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Reveal } from '../motion/Reveal';
 import { Magnetic } from '../motion/Magnetic';
+import { portfolioData } from '../../data/portfolio';
 
 const CtaSection = memo(() => {
     return (
@@ -30,10 +31,10 @@ const CtaSection = memo(() => {
                 <Reveal width="100%">
                     <div style={{ maxWidth: '700px', margin: '0 auto' }}>
                         <h2 style={{ fontSize: '3rem', marginBottom: '1.5rem', lineHeight: '1.1' }}>
-                            Ready to Build the Future?
+                            {portfolioData.cta.heading}
                         </h2>
                         <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '3rem' }}>
-                            Let's discuss how we can architect your next mission-critical system.
+                            {portfolioData.cta.description}
                         </p>
                         
                         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -41,11 +42,11 @@ const CtaSection = memo(() => {
                                 <motion.a 
                                     whileHover={{ boxShadow: '0 10px 40px rgba(0, 245, 255, 0.4)' }}
                                     whileTap={{ scale: 0.98 }}
-                                    href="#contact" 
+                                    href={portfolioData.cta.buttonLink} 
                                     className="btn btn-primary" 
                                     style={{ padding: '1.5rem 3rem', fontSize: '1.1rem', fontWeight: 700, display: 'inline-block' }}
                                 >
-                                    START_CONVERSATION
+                                    {portfolioData.cta.buttonText}
                                 </motion.a>
                             </Magnetic>
                         </div>

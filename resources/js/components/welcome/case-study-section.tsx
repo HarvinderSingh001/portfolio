@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Reveal } from '../motion/Reveal';
+import { portfolioData } from '../../data/portfolio';
 
 const CaseStudySection = memo(() => {
     return (
@@ -76,28 +77,26 @@ const CaseStudySection = memo(() => {
                                 zIndex: 10
                             }}
                         >
-                             <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem' }}>Uptime Guarantee</span>
-                             <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>99.99%</span>
+                             <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.25rem' }}>{portfolioData.caseStudy.uptimeTitle}</span>
+                             <span style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--accent-primary)' }}>{portfolioData.caseStudy.uptimeValue}</span>
                         </motion.div>
                     </motion.div>
                     
                     <div>
                         <Reveal>
-                            <span className="label-mini">FEATURED CASE STUDY</span>
+                            <span className="label-mini">{portfolioData.caseStudy.label}</span>
                         </Reveal>
                         <Reveal delay={0.3}>
-                            <h2 style={{ fontSize: '2.8rem', marginBottom: '1.5rem', lineHeight: '1.1' }}>Enterprise<br />Dashboard</h2>
+                            <h2 style={{ fontSize: '2.8rem', marginBottom: '1.5rem', lineHeight: '1.1' }}>{portfolioData.caseStudy.heading}</h2>
                         </Reveal>
                         <Reveal delay={0.5}>
                             <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '2rem', lineHeight: '1.7' }}>
-                                A high-fidelity visualization platform built for global logistics tracking. 
-                                The architecture supports real-time data streaming from 10k+ IoT sensors 
-                                with zero perceptible latency.
+                                {portfolioData.caseStudy.description}
                             </p>
                         </Reveal>
                         
                         <div style={{ display: 'flex', gap: '1rem', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
-                            {['Node.js', 'Express', 'MySQL', 'PHP Laravel'].map((tag, i) => (
+                            {portfolioData.caseStudy.tags.map((tag, i) => (
                                 <motion.span 
                                     key={tag} 
                                     initial={{ opacity: 0, y: 10 }}
@@ -133,7 +132,7 @@ const CaseStudySection = memo(() => {
                                     gap: '0.5rem' 
                                 }}
                             >
-                                Deep Dive Into Architecture 
+                                {portfolioData.caseStudy.linkText} 
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                     <polyline points="12 5 19 12 12 19"></polyline>

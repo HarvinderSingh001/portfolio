@@ -3,10 +3,13 @@ import {
     SiHtml5, SiCss, SiJavascript, SiTypescript, SiReact,
     SiPhp, SiLaravel, SiNodedotjs, SiExpress,
     SiMysql, SiPostgresql, SiMongodb, SiRedis,
-    SiDocker, SiGit, SiLinux, SiNginx
+    SiDocker, SiGit, SiLinux, SiNginx,
+    SiTailwindcss, SiJquery, SiStripe, SiTwilio, SiSwagger, SiGooglemaps, SiSocketdotio
 } from 'react-icons/si';
+import { FaAws } from 'react-icons/fa';
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useVelocity, useAnimationFrame } from 'framer-motion';
 import { Reveal } from '../motion/Reveal';
+import { portfolioData } from '../../data/portfolio';
 
 // ─── Constants & Data ─────────────────────────────────────────────────────────
 
@@ -17,6 +20,8 @@ const SkillIcons: Record<string, { icon: React.ReactNode; color: string }> = {
     JS:        { icon: <SiJavascript size={SZ} />, color: '#F7DF1E' },
     TS:        { icon: <SiTypescript size={SZ} />, color: '#3178C6' },
     REACT:     { icon: <SiReact      size={SZ} />, color: '#61DAFB' },
+    TAILWIND:  { icon: <SiTailwindcss size={SZ} />, color: '#06B6D4' },
+    JQUERY:    { icon: <SiJquery     size={SZ} />, color: '#0769AD' },
     PHP:       { icon: <SiPhp        size={SZ} />, color: '#777BB4' },
     LARAVEL:   { icon: <SiLaravel    size={SZ} />, color: '#FF2D20' },
     NODE:      { icon: <SiNodedotjs  size={SZ} />, color: '#339933' },
@@ -24,11 +29,17 @@ const SkillIcons: Record<string, { icon: React.ReactNode; color: string }> = {
     MYSQL:     { icon: <SiMysql      size={SZ} />, color: '#4479A1' },
     POSTGRES:  { icon: <SiPostgresql size={SZ} />, color: '#336791' },
     MONGODB:   { icon: <SiMongodb    size={SZ} />, color: '#47A248' },
+    STRIPE:    { icon: <SiStripe     size={SZ} />, color: '#008CDD' },
+    TWILIO:    { icon: <SiTwilio     size={SZ} />, color: '#F22F46' },
+    'GOOGLE MAPS': { icon: <SiGooglemaps size={SZ} />, color: '#4285F4' },
+    SWAGGER:   { icon: <SiSwagger    size={SZ} />, color: '#85EA2D' },
     REDIS:     { icon: <SiRedis      size={SZ} />, color: '#DC382D' },
     DOCKER:    { icon: <SiDocker     size={SZ} />, color: '#2496ED' },
     GIT:       { icon: <SiGit        size={SZ} />, color: '#F05032' },
     LINUX:     { icon: <SiLinux      size={SZ} />, color: '#FCC624' },
     NGINX:     { icon: <SiNginx      size={SZ} />, color: '#009639' },
+    AWS:       { icon: <FaAws        size={SZ} />, color: '#FF9900' },
+    WEBSOCKET: { icon: <SiSocketdotio size={SZ} />, color: '#ffffff' },
 };
 
 const SKILL_CONNECTIONS = [
@@ -37,10 +48,13 @@ const SKILL_CONNECTIONS = [
     { from: 'CSS', to: 'JS', color: '#1572B6' },
     { from: 'JS', to: 'TS', color: '#F7DF1E' },
     { from: 'TS', to: 'REACT', color: '#3178C6' },
+    { from: 'CSS', to: 'TAILWIND', color: '#1572B6' },
+    { from: 'JS', to: 'JQUERY', color: '#F7DF1E' },
 
     // Frontend -> Backend
     { from: 'REACT', to: 'NODE', color: '#61DAFB' },
     { from: 'REACT', to: 'LARAVEL', color: '#61DAFB' },
+    { from: 'JQUERY', to: 'LARAVEL', color: '#0769AD' },
 
     // Backend internal
     { from: 'NODE', to: 'EXPRESS', color: '#339933' },
@@ -52,6 +66,14 @@ const SKILL_CONNECTIONS = [
     { from: 'NODE', to: 'REDIS', color: '#339933' },
     { from: 'LARAVEL', to: 'POSTGRES', color: '#FF2D20' },
 
+    // Integrations & APIs
+    { from: 'LARAVEL', to: 'STRIPE', color: '#FF2D20' },
+    { from: 'LARAVEL', to: 'TWILIO', color: '#FF2D20' },
+    { from: 'LARAVEL', to: 'GOOGLE MAPS', color: '#FF2D20' },
+    { from: 'NODE', to: 'SWAGGER', color: '#339933' },
+    { from: 'LARAVEL', to: 'SWAGGER', color: '#FF2D20' },
+    { from: 'NODE', to: 'WEBSOCKET', color: '#339933' },
+
     // Connectivity & DevOps
     { from: 'GIT', to: 'NODE', color: '#F05032' },
     { from: 'GIT', to: 'LARAVEL', color: '#F05032' },
@@ -59,34 +81,12 @@ const SKILL_CONNECTIONS = [
     { from: 'NGINX', to: 'NODE', color: '#009639' },
     { from: 'DOCKER', to: 'LINUX', color: '#2496ED' },
     { from: 'NGINX', to: 'DOCKER', color: '#009639' },
+    { from: 'AWS', to: 'LARAVEL', color: '#FF9900' },
+    { from: 'AWS', to: 'NODE', color: '#FF9900' },
+    { from: 'AWS', to: 'DOCKER', color: '#FF9900' },
 ];
 
-const cards = [
-    {
-        id: 0,
-        title: 'Neural Interfaces',
-        description: 'Building sentient UIs that anticipate user intent through motion, physics, and cognitive design patterns.',
-        accent: '#00f5ff',
-        label: 'LAYER_ONE',
-        icon: '01'
-    },
-    {
-        id: 1,
-        title: 'Elastic Architecture',
-        description: 'Fault-tolerant distributed systems engineered for extreme scale and sub-millisecond orchestration.',
-        accent: '#7c3aed',
-        label: 'LAYER_TWO',
-        icon: '02'
-    },
-    {
-        id: 2,
-        title: 'Quantum Strategy',
-        description: "Data persistence and algorithmic optimization strategies that redefine what's possible in real-time.",
-        accent: '#f59e0b',
-        label: 'LAYER_THREE',
-        icon: '03'
-    },
-];
+const cards = portfolioData.features.cards;
 
 // ─── Sub-Components ───────────────────────────────────────────────────────────
 
@@ -387,14 +387,9 @@ const FeatureSection = memo(() => {
         mouseY.set(0);
     };
 
-    const skillGroups = [
-        { name: 'Frontend Layer', skills: ['HTML', 'CSS', 'JS', 'TS', 'REACT'] },
-        { name: 'Backend Engine', skills: ['PHP', 'LARAVEL', 'NODE', 'EXPRESS'] },
-        { name: 'Data Vault', skills: ['MYSQL', 'POSTGRES', 'MONGODB', 'REDIS'] },
-        { name: 'Infrastructure & Server', skills: ['GIT', 'NGINX', 'DOCKER', 'LINUX'] },
-    ];
+    const skillGroups = portfolioData.features.skillGroups;
 
-    const isConnected = (s1: string, s2: string) => SKILL_CONNECTIONS.some(c => (c.from === s1 && c.to === s2) || (c.from === s2 && c.to === s1));
+    const isConnected = (s1: string, s2: string) => false;
 
     return (
         <section style={{ backgroundColor: '#050507', padding: '180px 0', overflow: 'hidden', position: 'relative' }}>
@@ -411,10 +406,10 @@ const FeatureSection = memo(() => {
                             transition={{ duration: 4, repeat: Infinity }}
                             style={{ fontSize: '0.75rem', fontWeight: 900, color: '#00f5ff', textTransform: 'uppercase', marginBottom: '2rem' }}
                         >
-                            [ TECHNICAL_ARCHITECTURE_V3.0 ]
+                            {portfolioData.features.sectionLabel}
                         </motion.div>
                         <h2 style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', fontWeight: 900, color: '#fff', lineHeight: 0.85, letterSpacing: '-0.04em' }}>
-                            A Stack Built for <br /> <span style={{ color: '#00f5ff' }}>Extreme Scale.</span>
+                            {portfolioData.features.heading1} <br /> <span style={{ color: '#00f5ff' }}>{portfolioData.features.heading2}</span>
                         </h2>
                     </Reveal>
                 </div>
@@ -459,7 +454,6 @@ const FeatureSection = memo(() => {
                     }}
                 >
                     <div style={{ position: 'absolute', inset: 0, opacity: 0.1, backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0)', backgroundSize: '40px 40px', pointerEvents: 'none' }} />
-                    <ConnectionLayer nodeCoords={nodeCoords} hoveredSkill={hoveredSkill} />
                     
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10rem' }}>
                         {skillGroups.map((group, gi) => (
@@ -526,12 +520,11 @@ const FeatureSection = memo(() => {
                 </motion.div>
             </div>
 
-            {/* Hyper-Drammatic Background Text */}
             <div style={{ position: 'absolute', bottom: '-5%', left: 0, width: '200%', pointerEvents: 'none', mixBlendMode: 'overlay' }}>
                 <motion.div style={{ x: bgTextX, display: 'flex', gap: '10vw' }}>
                     {[1, 2].map(i => (
                         <span key={i} style={{ fontSize: '30rem', fontWeight: 900, color: 'rgba(255,255,255,0.015)', whiteSpace: 'nowrap', letterSpacing: '-0.04em' }}>
-                            SYSTEM ARCHITECTURE SYSTEM ARCHITECTURE
+                            {portfolioData.features.bgText}
                         </span>
                     ))}
                 </motion.div>

@@ -2,12 +2,14 @@ import React from 'react';
 import { Head } from '@inertiajs/react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import '../../css/welcome.css'; // Importing the custom professional styles
+import { portfolioData } from '../data/portfolio';
 
 // Memoized Components for Performance Optimization
 import NavBar from '@/components/welcome/nav-bar';
 import HeroSection from '@/components/welcome/hero-section';
 import FeatureSection from '@/components/welcome/feature-section';
 import CaseStudySection from '@/components/welcome/case-study-section';
+import ProjectsSection from '@/components/welcome/projects-section';
 import StatsSection from '@/components/welcome/stats-section';
 import CtaSection from '@/components/welcome/cta-section';
 import Footer from '@/components/welcome/footer';
@@ -31,7 +33,10 @@ export default function Welcome() {
             className="portfolio-wrapper" 
             style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)', minHeight: '100vh', position: 'relative' }}
         >
-            <Head title="Architect.dev | Performance & Optimization Specialist" />
+            <Head>
+                <title>{`${portfolioData.name} | ${portfolioData.role}`}</title>
+                <meta name="description" content={portfolioData.hero.description} />
+            </Head>
             
             {/* Background Transitions */}
             <DigitalRain />
@@ -63,17 +68,20 @@ export default function Welcome() {
                 <HeroSection />
                 
                 {/* Architectural Layers / Expertise */}
-                <div id="expertise">
+                <div id="skills">
                     <FeatureSection />
                 </div>
                 
                 {/* Case Study / Project Highlight */}
                 <div id="projects">
                     <CaseStudySection />
+                    <ProjectsSection />
                 </div>
                 
                 {/* Performance Stats & Terminal Board */}
-                <StatsSection />
+                <div id="experience">
+                    <StatsSection />
+                </div>
                 
                 {/* Call to Action */}
                 <div id="contact">

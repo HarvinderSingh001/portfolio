@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Magnetic } from '../motion/Magnetic';
+import { portfolioData } from '../../data/portfolio';
 
 const NavBar = memo(() => {
     return (
@@ -8,8 +9,16 @@ const NavBar = memo(() => {
             initial={{ y: -100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="glass" 
-            style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000, padding: '1rem 0' }}
+            style={{ 
+                position: 'fixed', 
+                top: 0, 
+                left: 0, 
+                right: 0, 
+                zIndex: 1000, 
+                padding: '1rem 0',
+                background: 'var(--bg-primary)',
+                borderBottom: '1px solid var(--border-color)'
+            }}
         >
             <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Magnetic>
@@ -23,13 +32,13 @@ const NavBar = memo(() => {
                             style={{ width: '12px', height: '12px', background: 'var(--accent-primary)', borderRadius: '2px' }}
                         ></motion.div>
                         <span style={{ fontSize: '1.2rem', fontWeight: 800, letterSpacing: '0.1em', fontFamily: 'var(--font-heading)' }}>
-                            ARCHITECT<span style={{ color: 'var(--accent-primary)' }}>.DEV</span>
+                            {portfolioData.logoName}<span style={{ color: 'var(--accent-primary)' }}>{portfolioData.logoDot}</span>
                         </span>
                     </motion.div>
                 </Magnetic>
                 
                 <ul style={{ display: 'flex', gap: '2rem', listStyle: 'none', margin: 0, padding: 0, alignItems: 'center' }}>
-                    {['Expertise', 'Projects', 'Contact', 'Terminal'].map((item, i) => (
+                    {portfolioData.navItems.map((item, i) => (
                         <motion.li 
                             key={item}
                             initial={{ opacity: 0, y: -20 }}
