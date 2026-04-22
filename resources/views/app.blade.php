@@ -4,6 +4,36 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        <!-- Primary Meta Tags (SEO Optimization) -->
+        <meta name="title" content="Harvinder Singh | Full-Stack Developer">
+        <meta name="description" content="Portfolio of Harvinder Singh, Full-Stack Developer specializing in Laravel, React, Livewire, and Scalable Enterprise Solutions.">
+        <meta name="keywords" content="Harvinder Singh, Full-Stack Developer, Laravel Developer, React Developer, Web Developer, Portfolio, Software Engineer">
+        <meta name="author" content="Harvinder Singh">
+        <meta name="robots" content="index, follow">
+
+        <!-- Open Graph / Facebook -->
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:title" content="Harvinder Singh | Full-Stack Developer">
+        <meta property="og:description" content="Portfolio of Harvinder Singh, Full-Stack Developer specializing in Laravel, React, and seamless API integrations. View my work and skills.">
+        <!-- Make sure to place an actual image at public/og-image.png for this to work -->
+        <meta property="og:image" content="{{ asset('/og-image.png') }}">
+
+        <!-- Twitter -->
+        <meta property="twitter:card" content="summary_large_image">
+        <meta property="twitter:url" content="{{ url()->current() }}">
+        <meta property="twitter:title" content="Harvinder Singh | Full-Stack Developer">
+        <meta property="twitter:description" content="Portfolio of Harvinder Singh, Full-Stack Developer specializing in Laravel, React, and seamless API integrations.">
+        <!-- Make sure to place an actual image at public/twitter-image.png for this to work -->
+        <meta property="twitter:image" content="{{ asset('/og-image.png') }}">
+
+        <!-- Canonical URL -->
+        <link rel="canonical" href="{{ url()->current() }}" />
+
+        <!-- Google Search Console Verification Placeholder -->
+        <!-- Add your verification code here after setting up Search Console: -->
+        <!-- <meta name="google-site-verification" content="YOUR_VERIFICATION_CODE" /> -->
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {

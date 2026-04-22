@@ -1,2 +1,5 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Allow: /
+
+Sitemap: https://harrydev.site/sitemap.xml
