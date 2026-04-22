@@ -100,7 +100,7 @@ const HeroSection = memo(() => {
                         {portfolioData.hero.label}
                     </motion.span>
                     
-                    <div style={{ marginBottom: '1.5rem' }}>
+                    <h1 style={{ marginBottom: '1.5rem', margin: 0, padding: 0, fontSize: 'inherit', fontWeight: 'normal', lineHeight: 'normal' }}>
                         <RevealCharacters 
                             text={portfolioData.hero.heading1} 
                             style={{ 
@@ -124,7 +124,7 @@ const HeroSection = memo(() => {
                             }}
                             className="text-gradient"
                         />
-                    </div>
+                    </h1>
                     
                     <motion.p 
                         variants={itemVariants}

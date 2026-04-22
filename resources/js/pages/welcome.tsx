@@ -36,6 +36,11 @@ export default function Welcome() {
             <Head>
                 <title>{`${portfolioData.name} | ${portfolioData.role}`}</title>
                 <meta name="description" content={portfolioData.hero.description} />
+                <meta name="keywords" content="Harvinder Singh, Full-Stack Developer, Laravel Developer, React Developer, Node.js, Web Development, PHP, JavaScript, Portfolio, Enterprise Solutions, Software Engineer" />
+                <meta property="og:title" content={`${portfolioData.name} | ${portfolioData.role}`} />
+                <meta property="og:description" content={portfolioData.hero.description} />
+                <meta property="og:type" content="website" />
+                <link rel="canonical" href="https://harrydev.site/" />
             </Head>
             
             {/* Background Transitions */}
