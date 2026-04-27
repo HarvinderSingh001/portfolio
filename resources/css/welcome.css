@@ -130,3 +130,19 @@ h1, h2, h3, h4 {
     margin-bottom: 1rem;
     display: block;
 }
+/* ─── Hero Profile: Responsive ─────────────────── */
+.hero-layout {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4rem;
+    align-items: center;
+}
+
+@media (max-width: 900px) {
+    .hero-layout {
+        grid-template-columns: 1fr;
+    }
+    .hero-profile-col {
+        display: none;
+    }
+}

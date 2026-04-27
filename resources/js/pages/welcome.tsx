@@ -40,6 +40,18 @@ export default function Welcome() {
                 <meta property="og:description" content={portfolioData.seo.description || portfolioData.hero.description} />
                 <meta property="og:type" content="website" />
                 <link rel="canonical" href={portfolioData.seo.canonicalUrl} />
+
+                {/* Google tag (gtag.js) */}
+                <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q3X7GCW328"></script>
+                <script dangerouslySetInnerHTML={{
+                    __html: `
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+
+                        gtag('config', 'G-Q3X7GCW328');
+                    `
+                }} />
             </Head>
             
             {/* Background Transitions */}
