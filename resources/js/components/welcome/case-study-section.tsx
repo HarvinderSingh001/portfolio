@@ -42,22 +42,18 @@ const CaseStudySection = memo(() => {
                                 decoding="async"
                                 style={{ width: '100%', borderRadius: '6px', opacity: 0.9 }}
                             />
-                            {/* Scanning Sweep Mask */}
-                            <motion.div 
-                                initial={{ x: '-100%' }}
-                                whileInView={{ x: '100%' }}
-                                transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
-                                style={{
-                                    position: 'absolute',
-                                    top: 0,
-                                    left: 0,
-                                    width: '100%',
-                                    height: '100%',
-                                    background: 'linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.2), transparent)',
-                                    zIndex: 2,
-                                    pointerEvents: 'none'
-                                }}
-                            />
+                            {/* Subtle Image Overlay instead of the scanning slider */}
+                            <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                width: '100%',
+                                height: '100%',
+                                background: 'linear-gradient(to bottom right, rgba(255,255,255,0.05), transparent)',
+                                zIndex: 2,
+                                pointerEvents: 'none',
+                                borderRadius: '6px'
+                            }} />
                         </motion.div>
                         
                         {/* Uptime Badge - matching image style */}

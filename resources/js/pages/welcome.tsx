@@ -69,10 +69,11 @@ export default function Welcome() {
                     top: 0,
                     left: 0,
                     right: 0,
-                    height: '3px',
-                    background: 'var(--accent-primary)',
+                    height: '2px',
+                    background: 'linear-gradient(90deg, #ff00ea, #00f5ff, #00ff66)',
                     transformOrigin: '0%',
-                    zIndex: 1001
+                    zIndex: 1001,
+                    boxShadow: '0 0 10px rgba(0, 245, 255, 0.4)'
                 }}
             />
 

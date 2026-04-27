@@ -23,7 +23,13 @@ const ProjectsSection = memo(() => {
                     {portfolioData.projectsGrid.map((project, index) => (
                         <Reveal key={index} delay={index * 0.1} fullHeight>
                             <motion.div 
-                                whileHover={{ y: -10, boxShadow: '0 20px 40px rgba(0,0,0,0.4)', borderColor: 'var(--accent-primary)' }}
+                                whileHover="hover"
+                                initial="rest"
+                                animate="rest"
+                                variants={{
+                                    rest: { y: 0, boxShadow: '0 4px 6px rgba(0,0,0,0.1)' },
+                                    hover: { y: -12, boxShadow: '0 25px 50px rgba(0,0,0,0.5)', scale: 1.02 }
+                                }}
                                 style={{
                                     background: 'var(--bg-tertiary)',
                                     borderRadius: '12px',
@@ -35,12 +41,27 @@ const ProjectsSection = memo(() => {
                                     transition: 'border-color 0.3s ease'
                                 }}
                             >
-                                <h3 style={{ fontSize: '1.5rem', marginBottom: '1rem', color: '#fff' }}>{project.title}</h3>
+                                <motion.h3 
+                                    variants={{
+                                        rest: { color: '#ffffff' },
+                                        hover: { color: 'var(--accent-primary)' }
+                                    }}
+                                    transition={{ duration: 0.3 }}
+                                    style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
+                                >
+                                    {project.title}
+                                </motion.h3>
                                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', marginBottom: '2rem', flexGrow: 1 }}>
                                     {project.description}
                                 </p>
                                 
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2rem' }}>
+                                <motion.div 
+                                    variants={{
+                                        rest: { opacity: 0.8 },
+                                        hover: { opacity: 1 }
+                                    }}
+                                    style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '2rem' }}
+                                >
                                     {project.tags.map((tag, i) => (
                                         <span 
                                             key={i}
@@ -55,7 +76,7 @@ const ProjectsSection = memo(() => {
                                             {tag}
                                         </span>
                                     ))}
-                                </div>
+                                </motion.div>
 
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '1.5rem', marginTop: 'auto' }}>
                                     <a href={project.github} target="_blank" rel="noreferrer" style={{ color: 'var(--text-dim)', textDecoration: 'none', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
