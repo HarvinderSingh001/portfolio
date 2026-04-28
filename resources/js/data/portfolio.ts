@@ -10,7 +10,7 @@ export const portfolioData = {
     // SEO Data
     seo: {
         title: "Harvinder Singh | Full-Stack Developer",
-        description: "Portfolio of Harvinder Singh, a Full-Stack Developer specializing in robust Laravel backends, modern React/Livewire frontends, and seamless API integrations.",
+        description: "Harvinder Singh – Full-Stack Developer skilled in Laravel, React, and API integrations. Explore projects and get in touch.",
         keywords: "Harvinder Singh, Full-Stack Developer, Laravel Developer, React Developer, Node.js, Web Development, PHP, JavaScript, Portfolio, Enterprise Solutions, Software Engineer",
         canonicalUrl: "https://harrydev.site/"
     },
